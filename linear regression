@@ -1,0 +1,126 @@
+项目背景：给出一些房价和面积的数据，试着对某个面积的房价做出预测
+（1）训练集：所选项目的训练数据集采用的是数组型数据并可视化为x-y的函数，利用numpy和matplotlib pyplot plot来完成
+（2）模型：通过可视化训练集的数据发现需要采用线性回归模型进行训练
+（3）策略：模型中包含的策略为代价函数cost fuction，梯度下降函数gradient descent
+（4）算法：代价函数算法和梯度下降算法，通过梯度下降算法不断迭代找到最优解的最小代价函数对应的参数w和b
+（5）对算法模型进行学习
+（6）预测或分析：利用最优算法按项目要求进行预测
+
+
+
+
+
+
+
+（1）训练姐
+#如何处理坐标数据类型的训练集，采用numpy以及matplotlib中的pyplot
+#其中数据的类型为数组类型，通过np.array传入横轴和纵轴坐标之后利用pyplot将数据可视化到坐标图中
+#pyplot中四个要素plt.title(设置坐标图标题),plt.xlabel（设置坐标图横轴说明）,plt.ylabel（设置坐标轴纵轴说明）,plt.plot(设置坐标参数关系)
+#最后plt.show()
+import numpy as np
+from matplotlib import pyplot as plt
+import math
+x_train=np.array([1.0,3.0,4.0,7.0,9.0])
+y_train=np.array([300,1000,1300,1900,3000])
+plt.title('linear regression')
+plt.xlabel('xlabel')
+plt.ylabel('ylabel')
+plt.plot(x_train,y_train,'x',color='r')
+plt.show()
+
+
+
+定义代价函数从给定的参数x，y,w,b计算其代价J
+def cost_function(x,y,w,b):                      #代价函数的算法实现
+    m=len(x)
+    cost_sum=0                                   #初始化循环中的参数变量
+    f_wb=np.zeros(m)
+    for i in range(m):                           #迭代的时候不能对int型m迭代，需要对列表迭代range(m)
+        f_wb[i]=x[i]*w+b
+        cost=y[i]-f_wb[i]                    
+        cost2=cost*cost
+        cost_sum=cost_sum+cost2                  #需要用到a=a+b，那么需要在循环外面初始化a的值
+    sum_cost=(1/(2*m))*cost_sum                  #2m要写成2*m
+    return sum_cost
+cost1=cost_function(x_train,y_train,313,-5)
+print(cost1)
+
+
+
+
+
+
+
+定义梯度下降算法中的偏导数并输出偏导数
+def gradient_descent_algorithm(x,y,w,b):                 #定义梯度下降算法中的偏导数
+    m=len(x)
+    dJ_dw=0
+    dJ_db=0
+    f_wb=np.zeros(m)                                     #循环内赋值前提需要在循环外初始化,对于数组的初始化a=np.zeros(m)此处为小括号
+    for i in range(m):                                   
+        f_wb[i]=x[i]*w+b
+        dJ_dw_1=f_wb[i]-y[i]
+        dJ_dw_2=dJ_dw_1*x[i]
+        dJ_dw_3=(1/m)*dJ_dw_2
+        dJ_dw=dJ_dw+dJ_dw_3
+        dJ_db_1=dJ_dw_1
+        dJ_db_2=(1/m)*dJ_db_1
+        dJ_db=dJ_db+dJ_db_2
+    return dJ_dw,dJ_db
+W,B=gradient_descent_algorithm(x_train,y_train,313,-5)
+print(W)
+print(B)
+
+
+定义梯度下降算法
+def gradient_descent(x, y, w_in, b_in, alpha, num_iters, cost_function, gradient_descent_algorithm): 
+    """
+    Args:
+      x (ndarray (m,))  : Data, m examples 
+      y (ndarray (m,))  : target values
+      w_in,b_in (scalar): initial values of model parameters  
+      alpha (float):     Learning rate
+      num_iters (int):   number of iterations to run gradient descent
+      cost_function:     function to call to produce cost
+      gradient_descent_algorithm: function to call to produce gradient
+      
+    Returns:
+      w (scalar): Updated value of parameter after running gradient descent
+      b (scalar): Updated value of parameter after running gradient descent
+      J_history (List): History of cost values
+      p_history (list): History of parameters [w,b] 
+      """
+    
+
+    # An array to store cost J and w's at each iteration primarily for graphing later
+    J_history = []
+    p_history = []
+    b = b_in
+    w = w_in
+    
+    for i in range(num_iters):
+        # Calculate the gradient and update the parameters using gradient_function
+        dj_dw, dj_db = gradient_descent_algorithm(x, y, w , b)     
+
+        # Update Parameters using equation (3) above
+        b = b - alpha * dj_db                            
+        w = w - alpha * dj_dw                            
+
+        # Save cost J at each iteration
+        if i<100000:      # prevent resource exhaustion 
+            J_history.append( cost_function(x, y, w , b))
+            p_history.append([w,b])
+        # Print cost every at intervals 10 times or as many iterations if < 10
+        if i% math.ceil(num_iters/10) == 0:
+            print(f"Iteration {i:4}: Cost {J_history[-1]:0.2e} ",
+                  f"dj_dw: {dj_dw: 0.3e}, dj_db: {dj_db: 0.3e}  ",
+                  f"w: {w: 0.3e}, b:{b: 0.5e}")    
+    return w, b, J_history, p_history #return w and J,w history for graphing
+    
+    
+    
+  w_in=0
+  b_in=0
+  alpha=1.0e-2
+  number_iter=10000
+  w_final,b_final,J_history,p_history=gradient_descent(x_train,y_train,w_in,b_in,alpha,number_iter,cost_function,gradient_descent_algorithm)
