@@ -118,9 +118,16 @@ def gradient_descent(x, y, w_in, b_in, alpha, num_iters, cost_function, gradient
     return w, b, J_history, p_history #return w and J,w history for graphing
     
     
-    
-  w_in=0
+  对模型进行学习  
+  w_in=0                                #一般情况下initialize data选择0
   b_in=0
-  alpha=1.0e-2
-  number_iter=10000
+  alpha=1.0e-2                          #alpha参数的选择不能过大也不能过小
+  number_iter=10000                     #迭代的次数
   w_final,b_final,J_history,p_history=gradient_descent(x_train,y_train,w_in,b_in,alpha,number_iter,cost_function,gradient_descent_algorithm)
+  
+  
+  
+  对模型进行预测
+  def predicte_housing_price(x,w,b)
+    y=x*w+b
+    return y
