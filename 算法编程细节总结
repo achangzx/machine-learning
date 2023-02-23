@@ -1,0 +1,81 @@
+1、(1)本文中没有阐述的是对线性回归模型的数学推导
+   (2)其中代价函数J分别于w和b都是二次函数的关系，且拥有最小值
+   (3)w=w-alpha*dJ_dw,b=b-alpha*dJ_db，这两个式子为梯度下降的灵魂
+2、未能解决的问题在于对于学习率alpha是人为设置的参数，如何设置alpha的大小不能够解决
+3、算法实现过程出现很多问题
+   (1)首先对于参与循环但未初始化的参数，需要在循环外进行初始化操作，a=0,a=np.zeros(m)此处为小括号
+    对于需要初始化但是不知道需要留几个位置，可以直接a=[]即可完成初始化，搭配a.append()或者a.append([])
+   (2)循环的次数a应该为列表的形式而不是一个数字的形式，for i in range(a)
+   (3)如何对一个列表或者一个数组添加元素，a.append(b),a.append([b,c])
+   (4)在进行机器学习的过程中迭代次数较多，一般我们可视化输出为每100次输出一个结果或者每1000次输出一个结果，
+   可用if i%math.ceil(x/10)==0:输出可视化结果，其中含义为总迭代次数为x，每(x/10)次输出一次，
+   i满足上述的式子则输出一个可视化结果，因为在迭代过程中i是从0到x不断往上加的
+   (5)输出方式print(f"字符串{输出参数:参数格式}")
+    参数格式4表示四位有效数字，0.3e表示小数点后保留三位有效数字
+    此输出方式非常方便，""为英文下的双引号不是英文下的两个单引号''
+    此输出方式可以在""之间任意添加字符串，可以""中通过{},在大括号中参入参数
+   (6)对数组的索引，x[:,1]表示输出数组的第二列，x[:,:1]表示出书数组的第一列，x[:,:3]表示输出数组的前三列
+    x[1:,]与x[1:,:]均表示输出数组的第二行之后的所有行包括第二行，x[1,:]与x[1,]均表示输出第二行
+    ps：冒号前一般包括，冒号后一般不包括
+   (7)numpy中提供了如何计算两个向量的内积，no.dot(x,y)输出结果为一个数字
+    numpy中还提供了如何计算一个m*n数组某一行或者某一列或者全部元素的均值np.mean(x,axis=0)按轴0计算，就是计算各列的均值，输出结果为
+    一个数组，数组中元素的个数为原数组的列数
+    np.std(x,axis=0/1)
+   (8)numpy拼接行数相同的数组np.c_[x1,x3],numpy拼接列数相同的数组np.r_[x1,x3]
+   (9)numpy中reshape用法，X1=X.reshape(-1,1)，-1的含义就是总共一列，按照实际数据分配行数
+4、如何利用matplotlib中的pyplot中的plt库来画图
+   （1）画一张图
+   plt.title
+   plt.xlabel
+   plt.ylabel
+   plt.plot(x,y,color='',label='')离散型数据需要选择'x'或者'o'因为plot默认会把这些点连城直线或者折现,color=''为标记的颜色
+   输出离散数据还有另外一种方法就是plt.scatter(x,y)默认就是离散的数据
+   plt.plot(x,y,c='r',label='',lw=1)   其中lw是调节线条的粗细程度
+   plt.xlim=(x自变量的坐标起始点，x自变量的坐标终点)
+   plt.ylim=(y自变量的坐标起始点，y自变量的坐标终点)
+   plt.legend()     在plt.show前面加入此行代码可以让label正确的显示
+   plt.show()
+   （2）画多张图x=a*b
+   fig,ax=plt.subplots(a,b,figsize=(长，宽))
+   ax[1].plot()
+   ax[1].set_title
+   ax[1].set_xlabel
+   ax[1].set_ylabel
+   ax[1].set_xlim()
+   ax[1].set_ylim()
+   ax[1].legend()        加入此行代码可以让label正确的显示
+   ...
+   plt.show()
+
+
+
+
+
+
+
+如何用现成的模块进行线性回归预测
+所需工具为scikit-learn
+scikit-learn模块中的两个类方法
+其中之一为StandardScaler,引用方法为from sklearn.preprocessing import StandardScaler
+另一个为SGDRegressor,引用方法为from sklearn.linear_model import SGDRegressor
+
+标准化z-score过程
+1、*加载数据X,y
+2、*引入类scaler=StandardScaler()小括号中的参数全部默认
+3、*引入类中的方法fit导入数据，scaler.fit(X)
+4、查看原始数据的均值，方差，特征值的个数，权重，总共扫描scaler.mean_,scaler.var_,scaler.n_fetures_in_,scaler.scale_,scaler.n_samples_seen_
+5、*调用类中的方法fit_transform输出标准化后的结果 X_normal=scaler.fit_transform(X)
+
+随机梯度下降算法的实现过程
+1、*引入类SGDR=SGDRrgressor()参数可以默认，其中alpha默认为0.0001，max_iter默认是1000
+2、*引入类中的方法fit导入数据，SGDR.fit(X_normal,y)
+3、可以查看满足要求所迭代的次数、总共更新的样本数据的个数SGD.n_iter_,SGD.t_
+4、*输出迭代结束后系数W和截距b  SGDR.coef_,SGDR.intercept_
+5、*引用类中的方法SGDR.predict(X_normal)可以得到y_predict
+6、*通过可视化观察模型训练的结果与实际数值,其中n为特征值的个数
+fig,ax=plt.subplots(1,n,figsize=(14,3))
+for i in range(len(ax)):
+    ax[i].scatter(X_normal[:,i],y,label='actual datas')
+    ax[i].plot(X_normal[:,i],y_predict,'o',c='r',label='predict data')
+    ax[i].legend()
+plt.show()
