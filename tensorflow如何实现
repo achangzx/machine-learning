@@ -1,0 +1,32 @@
+#模型的定义
+第一层120个units，激活函数为relu，正则化参数为tf.keras.regularizers.l2(0.1))，
+第二层40个units，激活函数为relu，正则化参数为tf.keras.regularizers.l2(0.1)),
+第三层6个units，激活函数为linear，
+损失函数选择SparseCategoricalCrossentropy
+优化器选择Adam，学习率为0.01
+导入数据，并设置迭代次数为1000
+最后查看模型的整体情况
+
+
+model = Sequential(
+    [Dense(120,activation='relu',kernel_regularizer=tf.keras.regularizers.l2(0.1)),
+     Dense(40,activation='relu',kernel_regularizer=tf.keras.regularizers.l2(0.1)),
+     Dense(6,activation='linear')，  
+    ], name= 'complex_model'
+)
+
+
+model.compile(
+    loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
+)
+
+
+
+model.fit(
+    X_train, y_train,
+    epochs=1000
+)
+
+
+model.summary()
