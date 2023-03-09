@@ -85,6 +85,7 @@
             if iter % 20 == 0:
               print(f"Training loss at iteration {iter}: {cost_value:0.1f}")
    最后做出预测：
-    my_predicte=np.dot(X,np.transpose(W))+b
+    my_predicte=np.dot(X,np.transpose(W))+b #此处输出的预测是新用户A的评分和整个Y，所以第一列才是我们要的
     my_predicte=my_predicte+mean        #在训练的时候对Y已经进行了标准化，测试的时候一定也要记得标准化
-   最后通过迭代输出可视化我们的预测结果
+    my_predicte=my_predicte[:,0]
+   最后通过迭代输出可视化我们的预测结果，可视化的时候一定要把两种情况分开，新用户参与评分的电影（>0）和新用户没参与评分的电影（0）
