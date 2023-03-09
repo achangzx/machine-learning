@@ -1,7 +1,7 @@
 协同过滤算法：Collaborative filtering algorithm
   适合问题：推荐系统
   实现原理（以电影推荐为例）：
-    这是第一种协同过滤算法，
+    这是第一种协同过滤算法，传统算法，需要对公式推导正确，还有就是了解各个参数的行列都是什么属性，还有就是行列的个数，这个是算法的核心，但是算法的实现过程比较麻烦，属于入门级别的算法
     def cofi_cost_func(X, W, b, Y, R, lambda_):
     """
     Returns the cost for the content-based filtering
@@ -20,7 +20,7 @@
     J = 0 loss=0
     for j in range(nu):
         for i in range(nm):
-            loss=0.5*R[i,j]*((np.dot(W[j,:],X[i,:])+b[0,j]-Y[i,j])**2)+loss        
+            loss=0.5*R[i,j]*((np.dot(W[j,:],X[i,:])+b[0,j]-Y[i,j])**2)+loss     #充分了解w，x的属性，也就是我们的回归参数包括行列的个数，行列均代表什么含义，算法的核心********   
     regularization1=0
     regularization2=0
     for j in range(nu):
@@ -35,7 +35,9 @@
     
     
     
-    以下是第二种协同过滤算法利用tensorflow实现def cofi_cost_func(X, W, b, Y, R, lambda_):
+    以下是第二种协同过滤算法利用tensorflow实现，通过矩阵进行实现，大大简化计算过程，但是前提是对于各个参数变量的属性都做了非常清楚的了解，还有就是tensorflow中一些常用函数
+    优点很明显就是可以不用对参数w，x的行列进行编码迭代，因为通过矩阵的形式非常简单，但是如何实现比较麻烦。进阶算法
+    def cofi_cost_func(X, W, b, Y, R, lambda_):
     """
     Returns the cost for the content-based filtering
     Args:
@@ -51,5 +53,6 @@
     nm, nu = Y.shape
     m,n=X.shape
     J = 0   
-    j=(tf.linalg.matmul(X,tf.transpose(W))+b-Y)*R
-    J=0.5*tf.reduce_sum(j**2)+0.5*lambda_*(tf.reduce_sum(X**2)+tf.reduce_sum(W**2))
+    j=(tf.linalg.matmul(X,tf.transpose(W))+b-Y)*R                                           #tf.linalg.matmul（）表示进行矩阵乘法运算（和线性代数中完全相同），tf.transpose（）输出矩阵的转置
+    J=0.5*tf.reduce_sum(j**2)+0.5*lambda_*(tf.reduce_sum(X**2)+tf.reduce_sum(W**2))         #tf.reduce_sum（）输出是矩阵的每一项相加
+
