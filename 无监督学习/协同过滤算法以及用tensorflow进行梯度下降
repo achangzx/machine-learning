@@ -1,4 +1,4 @@
-协同过滤算法：Collaborative filtering algorithm
+1、协同过滤算法：Collaborative filtering algorithm
   适合问题：推荐系统
   实现原理（以电影推荐为例）：
     这是第一种协同过滤算法，传统算法，需要对公式推导正确，还有就是了解各个参数的行列都是什么属性，还有就是行列的个数，这个是算法的核心，但是算法的实现过程比较麻烦，属于入门级别的算法
@@ -55,4 +55,36 @@
     J = 0   
     j=(tf.linalg.matmul(X,tf.transpose(W))+b-Y)*R                                           #tf.linalg.matmul（）表示进行矩阵乘法运算（和线性代数中完全相同），tf.transpose（）输出矩阵的转置
     J=0.5*tf.reduce_sum(j**2)+0.5*lambda_*(tf.reduce_sum(X**2)+tf.reduce_sum(W**2))         #tf.reduce_sum（）输出是矩阵的每一项相加
-
+2、推荐预测的步骤
+  完成协同过滤算法
+  添加新用户A，让他对数据集中的电影随机进行几个评级或者可以不评价（如果不评价的化，给出来的推荐将会是数据集的均值，评价的越多预测越准确）
+    MY_rates=np.zeros(number_movies)
+    接下来对这里面电影的索引进行赋值即为对电影进行评价
+    例如MY_rates[4]=0
+    评价完后将我们的新用户的数据加入Y中
+    MY_rates=np.c_(MY_rates,Y)
+    R=np.c_[(MY_rate != 0).astype(int), R]  将我们对电影的评价不等于0的部分输出为布尔值1，加给R
+  对数据集Y进行标准化处理（评级，评分）
+    对数据Y的标准化处理比较特殊，同时取决于Y和R因为没有评分的那部分不参与计算（此处需要用的时候得去查阅相关资料）
+  通过tensorflow实现梯度下降算法，让模型从数据集中学习到W,X,b
+    tensorflow中提供了初始化参数的方法，并且可以在此之后更新参数的方法
+    参数a=tf.Variable(参数初始化的形状（一般初始化可以采用随机值或者0），dtype=tf.float64,name='a')
+    W = tf.Variable(tf.random.normal((num_users,  num_features),dtype=tf.float64),  name='W')
+    X = tf.Variable(tf.random.normal((num_movies, num_features),dtype=tf.float64),  name='X')
+    b = tf.Variable(tf.random.normal((1,          num_users),   dtype=tf.float64),  name='b')
+  在tensorflow中实现梯度下降一般要采用优化器
+    optimizer = keras.optimizers.Adam(learning_rate=1e-1)
+  接下来和pytorch中大差不大开始进行循环迭代更新参数
+    iterations = 200
+    lambda_ = 1
+    for iter in range(iterations)：
+        with tf.GradientTape() as tape:
+            cost_value = cofi_cost_func_v(X, W, b, Ynorm, R, lambda_)
+            grads = tape.gradient( cost_value, [X,W,b] )
+            optimizer.apply_gradients( zip(grads, [X,W,b]) )
+            if iter % 20 == 0:
+              print(f"Training loss at iteration {iter}: {cost_value:0.1f}")
+   最后做出预测：
+    my_predicte=np.dot(X,np.transpose(W))+b
+    my_predicte=my_predicte+mean        #在训练的时候对Y已经进行了标准化，测试的时候一定也要记得标准化
+   最后通过迭代输出可视化我们的预测结果
