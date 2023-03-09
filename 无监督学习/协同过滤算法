@@ -1,6 +1,55 @@
 协同过滤算法：Collaborative filtering algorithm
   适合问题：推荐系统
   实现原理（以电影推荐为例）：
-    如果电影的特征已知（即为x矩阵已知，例如电影是浪漫片子的概率和动作片的概率），某个人只看过我们系统里的其中三部，通过线性回归w*x+b可以学习参数w和b，进而对
-    这个人没看过的那两部电影进行预测。（参数的属性其实就是这个人对电影特征的感受进行数字化处理）。
-    如果电影的特征未知，而已知多个人对同一部电影的评价，此时也就是上面所说的参数w和b已知，通过线性回归w*x+b学习参数x
+    这是第一种协同过滤算法，
+    def cofi_cost_func(X, W, b, Y, R, lambda_):
+    """
+    Returns the cost for the content-based filtering
+    Args:
+      X (ndarray (num_movies,num_features)): matrix of item features
+      W (ndarray (num_users,num_features)) : matrix of user parameters
+      b (ndarray (1, num_users)            : vector of user parameters
+      Y (ndarray (num_movies,num_users)    : matrix of user ratings of movies
+      R (ndarray (num_movies,num_users)    : matrix, where R(i, j) = 1 if the i-th movies was rated by the j-th user
+      lambda_ (float): regularization parameter
+    Returns:
+      J (float) : Cost
+    """
+    nm, nu = Y.shape
+    m,n=X.shape
+    J = 0 loss=0
+    for j in range(nu):
+        for i in range(nm):
+            loss=0.5*R[i,j]*((np.dot(W[j,:],X[i,:])+b[0,j]-Y[i,j])**2)+loss        
+    regularization1=0
+    regularization2=0
+    for j in range(nu):
+        for k in range(n):
+            regularization1=0.5*lambda_*(W[j,k]**2)+regularization1
+    for i in range(nm):
+        for k in range(n):
+            regularization2=0.5*lambda_*(X[i,k]**2)+regularization2
+    J=loss+regularization1+regularization2 
+
+    return J    
+    
+    
+    
+    以下是第二种协同过滤算法利用tensorflow实现def cofi_cost_func(X, W, b, Y, R, lambda_):
+    """
+    Returns the cost for the content-based filtering
+    Args:
+      X (ndarray (num_movies,num_features)): matrix of item features
+      W (ndarray (num_users,num_features)) : matrix of user parameters
+      b (ndarray (1, num_users)            : vector of user parameters
+      Y (ndarray (num_movies,num_users)    : matrix of user ratings of movies
+      R (ndarray (num_movies,num_users)    : matrix, where R(i, j) = 1 if the i-th movies was rated by the j-th user
+      lambda_ (float): regularization parameter
+    Returns:
+      J (float) : Cost
+    """
+    nm, nu = Y.shape
+    m,n=X.shape
+    J = 0   
+    j=(tf.linalg.matmul(X,tf.transpose(W))+b-Y)*R
+    J=0.5*tf.reduce_sum(j**2)+0.5*lambda_*(tf.reduce_sum(X**2)+tf.reduce_sum(W**2))
